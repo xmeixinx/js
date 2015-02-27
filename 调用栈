@@ -1,0 +1,61 @@
+许多大型的JavaScript应用程序间的函数调用关系是非常复杂的，在开发或者调试过程中，
+经常需要跟踪某个函数是由哪些函数调用后才触发执行的，弄清楚这些函数的调用顺序对我们理解代码的数据流向是非常重要的。
+
+Firebug提供了console.trace()来显示函数堆栈，在需要调试的地方加上下面的一行代码就能显示该函数调用时的上下文关系。
+IE6就没有这么方便了，它没有提供显示函数堆栈的工具，当不可避免的需要在IE6下调试代码时，
+使用下面的代码能够显示函数堆栈（建议将下面的JavaScript代码保存为console.trace.js，通过外部引入js的方式引用到页面）：
+PLAIN TEXT
+JAVASCRIPT:
+
+    /**
+    * 获取函数名称
+    *
+    * @param {Function} func 函数引用
+    * @return {String} 函数名称
+    */
+    function getFunctionName(func) {
+        if ( typeof func == 'function' || typeof func == 'object' ) {
+            var name = ('' + func).match(/function\s*([\w\$]*)\s*\(/);
+        }
+        return name && name[1];
+    }
+     
+    if (!('console' in window)) {
+        window.console = {};
+    }
+    if (!console.trace) {
+        /**
+         * 显示函数堆栈<br/>
+         * 为了和Firebug统一，将trace方法添加到console对象中
+         *
+         * @param {Function} func 函数引用
+         *
+         * @example
+    function a() {
+    b();
+    }
+    function b() {
+    c();
+    }
+    function c() {
+    d();
+    }
+    function d() {
+    console.trace();
+    }
+
+    a();
+         */
+        console.trace = function() {
+            var stack = [],
+                caller = arguments.callee.caller;
+     
+            while (caller) {
+                stack.unshift(getFunctionName(caller));
+                caller = caller && caller.caller;
+            }
+     
+            alert('functions on stack:' + '\n' + stack.join('\n'));
+        }
+    };
+
