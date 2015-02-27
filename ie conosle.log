@@ -1,0 +1,131 @@
+var console={
+assert:function(){
+},
+clear:function(){
+},
+count:function(){
+},
+debug:function(){
+},
+dir:function(){
+},
+dirxml:function(){
+},
+error:function(){
+var args=Array.prototype.slice.call(arguments);
+consoleHelper.showerror(args.join(" "));
+},
+exception:function(){
+},
+group:function(name){
+consoleHelper.showgroup(name);
+},
+groupCollapsed:function(){
+},
+groupEnd:function(){
+}, 
+log:function(){
+var args=Array.prototype.slice.call(arguments);
+if(args.length>1){
+var i=1,hasstyle=false;
+if(args[0].indexOf("%c")==0){
+args[0]=args[0].replace(/%c/,"");
+i=2;
+hasstyle=true;
+}
+for(;i<args.length;i++){
+if(/%s|%d|%i|%o/.test(args[0])){
+args[0]=args[0].replace(/%s|%d|%i|%o/,args[i]);
+}
+else{
+break;
+}
+}
+if(i<args.length){
+args[0]=args[0]+" "+args.slice(i).join(" ");
+}
+if(hasstyle){
+consoleHelper.showlog(args[0],args[1]);
+}
+else{
+consoleHelper.showlog(args[0]);
+}
+}
+else if(args.length==1){
+if(arguments[0] instanceof Array){
+consoleHelper.showlog("["+args[0]+"]");
+}
+else if(arguments[0] instanceof Function){
+consoleHelper.showlog(args[0],null,"console_log_function");
+}
+else{
+consoleHelper.showlog(args[0]);
+}
+}
+else{
+consoleHelper.showlog("");
+}
+} 
+};
+
+
+//consoleHelper
+var consoleHelper={
+showlog:function(val,style,cla){
+if(cla){
+cla="console_log "+cla;
+}
+else{
+cla="console_log";
+}
+this.show(val,style,cla);
+},
+showinfo:function(val,cla){
+if(cla){
+cla="console_info "+cla;
+}
+else{
+cla="console_info";
+}
+this.show(val,null,cla);
+},
+showwarn:function(val,cla){
+if(cla){
+cla="console_warn "+cla;
+}
+else{
+cla="console_warn";
+}
+this.show(val,null,cla);
+},
+showerror:function(val){
+this.show(val,null,"console_error");
+},
+showgroup:function(val){
+if(!val){
+val="";
+}
+this.show(val+":",null,"console_group");
+},
+show:function(val,style,cla){
+if(document.getElementById("showconsole")){
+var div=document.createElement("div");
+if(div.setAttribute){
+if(style){
+div.setAttribute("style",style);
+}
+}
+else{
+if(style){
+div=document.createElement("<div style="+style+">");
+}
+}
+if(cla){
+div.className=cla;
+}
+var oText=document.createTextNode(val);
+div.appendChild(oText);
+document.getElementById("showconsole").appendChild(div);
+}
+}
+}; 
